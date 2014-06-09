@@ -42,6 +42,7 @@ import java.io.InputStream;
 
 public class Helpers implements Constants {
 
+    private final static boolean DEBUG = false;
     private static String mVoltagePath;
 
     /**
@@ -201,6 +202,7 @@ public class Helpers implements Constants {
             } finally {
                 fw.close();
             }
+            if (DEBUG) Log.i(TAG, "Write value " + value + " to " + fname);
         } catch (IOException e) {
             String Error = "Error writing to " + fname + ". Exception: ";
             Log.e(TAG, Error, e);
@@ -439,7 +441,9 @@ public class Helpers implements Constants {
     }
 
     public static String shExec(StringBuilder s, Context c, Boolean su) {
-        get_assetsScript("run", c, s.toString(), "");
+        String sContent = s.toString();
+        if (DEBUG) Log.i(TAG, sContent);
+        get_assetsScript("run", c, sContent, "");
         if (isSystemApp(c)) {
             new CMDProcessor().sh.runWaitFor("busybox chmod 750 " + c.getFilesDir() + "/run");
         } else {
