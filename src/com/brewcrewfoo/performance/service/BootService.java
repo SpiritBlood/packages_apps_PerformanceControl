@@ -27,7 +27,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.brewcrewfoo.performance.R;
 import com.brewcrewfoo.performance.fragments.VoltageControlSettings;
@@ -39,7 +38,6 @@ import java.io.File;
 import java.util.List;
 
 public class BootService extends Service implements Constants {
-    private final static boolean DEBUG = false;
     public static boolean servicesStarted = false;
     Context context;
 
@@ -173,15 +171,6 @@ public class BootService extends Service implements Constants {
                     sb.append("busybox echo ").append(preferences.getInt(
                             PREF_BLX, Integer.parseInt(Helpers.readOneLine(BLX_PATH))))
                             .append(" > ").append(BLX_PATH).append(";\n");
-                }
-            }
-            if (new File(LOGCAT_PATH).exists()) {
-                boolean prefLogcat = preferences.getBoolean(PREF_LOGCAT, false);
-                if (DEBUG) Log.i(TAG, "Boot: prefLogcat is " + prefLogcat);
-                if (prefLogcat) {
-                    sb.append("echo 0 > " + LOGCAT_PATH + ";\n");
-                } else {
-                    sb.append("echo 1 > " + LOGCAT_PATH + ";\n");
                 }
             }
             if (new File(DSYNC_PATH).exists()) {

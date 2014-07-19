@@ -39,18 +39,6 @@ Copyright (C) 2012  James Roberts
             android:title="@string/sob" />
     </PreferenceCategory>
 
-    <!-- Logcat -->
-    <PreferenceCategory
-        android:key="logcat"
-        android:title="@string/prefcat_logcat">
-
-        <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="pref_logcat"
-            android:summary="@string/ps_logcat"
-            android:title="@string/pt_logcat" />
-    </PreferenceCategory>
-
     <!-- Force high-end graphics -->
     <PreferenceCategory
         android:key="category_force_highend_gfx"

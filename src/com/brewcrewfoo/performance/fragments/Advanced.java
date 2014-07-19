@@ -37,7 +37,6 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -61,9 +60,6 @@ import java.io.File;
 public class Advanced extends PreferenceFragment
         implements OnSharedPreferenceChangeListener, Constants {
 
-    private final static boolean DEBUG = false;
-
-    private CheckBoxPreference mLogcat;
     private CheckBoxPreference mDsync;
 
     private Preference mBltimeout;
@@ -111,7 +107,6 @@ public class Advanced extends PreferenceFragment
         mBltimeout = findPreference(PREF_BLTIMEOUT);
         mBltouch = (CheckBoxPreference) findPreference(PREF_BLTOUCH);
         mBln = (CheckBoxPreference) findPreference(PREF_BLN);
-        mLogcat = (CheckBoxPreference) findPreference(PREF_LOGCAT);
         mDsync = (CheckBoxPreference) findPreference(PREF_DSYNC);
         mHomeOn = (CheckBoxPreference) findPreference(PFK_HOME_ON);
         mHomeAllowedIrqs = findPreference(PREF_HOME_ALLOWED_IRQ);
@@ -125,14 +120,7 @@ public class Advanced extends PreferenceFragment
         mDynamicWriteBackActive = findPreference(PREF_DIRTY_WRITEBACK_ACTIVE);
         mDynamicWriteBackSuspend = findPreference(PREF_DIRTY_WRITEBACK_SUSPEND);
 
-        if (!new File(LOGCAT_PATH).exists()) {
-            PreferenceCategory hideCat = (PreferenceCategory) findPreference("logcat");
-            getPreferenceScreen().removePreference(hideCat);
-        } else {
-            boolean bLogcatDisabled = Helpers.readOneLine(LOGCAT_PATH).equals("0");
-            if (DEBUG) Log.i(TAG, "Start: logcat_enabled is " + (bLogcatDisabled ? "0" : "1"));
-            mLogcat.setChecked(bLogcatDisabled);
-        }
+
         if (!new File(DSYNC_PATH).exists()) {
             PreferenceCategory hideCat = (PreferenceCategory) findPreference("dsync");
             getPreferenceScreen().removePreference(hideCat);
@@ -219,16 +207,7 @@ public class Advanced extends PreferenceFragment
     @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
 
-        if (preference == mLogcat) {
-            if (mLogcat.isChecked()) {
-                if (DEBUG) Log.i(TAG, "Manual: Set logcat_enabled to 0");
-                new CMDProcessor().su.runWaitFor("busybox echo 0 > " + LOGCAT_PATH);
-            } else {
-                if (DEBUG) Log.i(TAG, "Manual: Set logcat_enabled to 1");
-                new CMDProcessor().su.runWaitFor("busybox echo 1 > " + LOGCAT_PATH);
-            }
-            return true;
-        } else if (preference == mDsync) {
+        if (preference == mDsync) {
             if (Integer.parseInt(Helpers.readOneLine(DSYNC_PATH)) == 0) {
                 if (Helpers.isSystemApp(getActivity())) {
                     Helpers.writeOneLine(DSYNC_PATH, "1");
@@ -380,11 +359,7 @@ public class Advanced extends PreferenceFragment
     @Override
     public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, String key) {
         final SharedPreferences.Editor editor = sharedPreferences.edit();
-        if (key.equals(PREF_LOGCAT)) {
-            boolean disableLogcat = mLogcat.isChecked();
-            editor.putBoolean(PREF_LOGCAT, disableLogcat).apply();
-            if (DEBUG) Log.i(TAG, "Store: disableLogcat is " + (disableLogcat ? "true" : "false"));
-        } else if (key.equals(PREF_READ_AHEAD)) {
+        if (key.equals(PREF_READ_AHEAD)) {
             final String values = mReadAhead.getValue();
             if (!values.equals(Helpers.readOneLine(READ_AHEAD_PATH))) {
                 new CMDProcessor().su.runWaitFor("busybox echo " + values + " > " + READ_AHEAD_PATH);
